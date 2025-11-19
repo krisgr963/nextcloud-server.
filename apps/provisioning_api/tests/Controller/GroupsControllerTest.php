@@ -7,6 +7,7 @@
  */
 namespace OCA\Provisioning_API\Tests\Controller;
 
+use OC\Group\DisplayNameCache as GroupDisplayNameCache;
 use OC\Group\Manager;
 use OC\User\NoUserException;
 use OCA\Provisioning_API\Controller\GroupsController;
@@ -36,6 +37,7 @@ class GroupsControllerTest extends \Test\TestCase {
 	protected IFactory&MockObject $l10nFactory;
 	protected LoggerInterface&MockObject $logger;
 	protected GroupsController&MockObject $api;
+	private GroupDisplayNameCache&MockObject $groupDisplayNameCache;
 
 	private IRootFolder $rootFolder;
 
@@ -53,6 +55,7 @@ class GroupsControllerTest extends \Test\TestCase {
 		$this->l10nFactory = $this->createMock(IFactory::class);
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->rootFolder = $this->createMock(IRootFolder::class);
+		$this->groupDisplayNameCache = $this->createMock(GroupDisplayNameCache::class);
 
 		$this->groupManager
 			->method('getSubAdmin')
@@ -70,7 +73,8 @@ class GroupsControllerTest extends \Test\TestCase {
 				$this->subAdminManager,
 				$this->l10nFactory,
 				$this->rootFolder,
-				$this->logger
+				$this->logger,
+				$this->groupDisplayNameCache,
 			])
 			->onlyMethods(['fillStorageInfo'])
 			->getMock();

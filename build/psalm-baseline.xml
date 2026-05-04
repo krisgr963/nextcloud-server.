@@ -3289,6 +3289,24 @@
       <code><![CDATA[generate]]></code>
     </DeprecatedMethod>
   </file>
+  <file src="core/Sharing/Recipient/TeamShareRecipientType.php">
+    <ImplementedParamTypeMismatch>
+      <code><![CDATA[$event]]></code>
+    </ImplementedParamTypeMismatch>
+    <InvalidArgument>
+      <code><![CDATA[self::class]]></code>
+    </InvalidArgument>
+    <InvalidTemplateParam>
+      <code><![CDATA[IEventListener]]></code>
+    </InvalidTemplateParam>
+    <UndefinedClass>
+      <code><![CDATA[DestroyingCircleEvent]]></code>
+    </UndefinedClass>
+    <UndefinedDocblockClass>
+      <code><![CDATA[$event]]></code>
+      <code><![CDATA[TeamShareRecipientType]]></code>
+    </UndefinedDocblockClass>
+  </file>
   <file src="core/templates/publicshareauth.php">
     <DeprecatedMethod>
       <code><![CDATA[provideInitialState]]></code>
@@ -4268,6 +4286,11 @@
     <MoreSpecificReturnType>
       <code><![CDATA[array{X-Request-Id: string, Cache-Control: string, Content-Security-Policy: string, Feature-Policy: string, X-Robots-Tag: string, Last-Modified?: string, ETag?: string, ...H}]]></code>
     </MoreSpecificReturnType>
+  </file>
+  <file src="lib/public/EventDispatcher/IEventListener.php">
+    <MismatchingDocblockParamType>
+      <code><![CDATA[T]]></code>
+    </MismatchingDocblockParamType>
   </file>
   <file src="lib/public/ICache.php">
     <AmbiguousConstantInheritance>

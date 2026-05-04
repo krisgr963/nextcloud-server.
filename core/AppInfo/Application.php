@@ -24,8 +24,20 @@ use OC\Core\Listener\BeforeTemplateRenderedListener;
 use OC\Core\Listener\PasswordUpdatedListener;
 use OC\Core\Listener\RestrictInteractionListener;
 use OC\Core\Notification\CoreNotifier;
+use OC\Core\Sharing\Permission\EditSharePermissionPreset;
+use OC\Core\Sharing\Permission\ViewSharePermissionPreset;
+use OC\Core\Sharing\Property\ExpirationDateSharePropertyType;
+use OC\Core\Sharing\Property\LabelSharePropertyType;
+use OC\Core\Sharing\Property\NoteSharePropertyType;
+use OC\Core\Sharing\Property\PasswordSharePropertyType;
+use OC\Core\Sharing\Recipient\EmailShareRecipientType;
+use OC\Core\Sharing\Recipient\GroupShareRecipientType;
+use OC\Core\Sharing\Recipient\TeamShareRecipientType;
+use OC\Core\Sharing\Recipient\TokenShareRecipientType;
+use OC\Core\Sharing\Recipient\UserShareRecipientType;
 use OC\OCM\OCMDiscoveryHandler;
 use OC\OCM\OCMJwksHandler;
+use OC\Sharing\Permission\ReshareSharePermissionType;
 use OC\TagManager;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
@@ -41,6 +53,7 @@ use OCP\IURLGenerator;
 use OCP\IUserSession;
 use OCP\L10N\IFactory;
 use OCP\Server;
+use OCP\Sharing\ISharingRegistry;
 use OCP\User\Events\BeforeUserDeletedEvent;
 use OCP\User\Events\PasswordUpdatedEvent;
 use OCP\User\Events\UserDeletedEvent;
@@ -101,6 +114,40 @@ class Application extends App implements IBootstrap {
 		$context->registerCapability(Capabilities::class);
 
 		$context->registerEventListener(RestrictInteractionEvent::class, RestrictInteractionListener::class);
+
+		$registry = Server::get(ISharingRegistry::class);
+
+		$registry->registerRecipientType(new EmailShareRecipientType());
+		$registry->registerRecipientType(Server::get(GroupShareRecipientType::class));
+		$registry->registerRecipientType(Server::get(TeamShareRecipientType::class));
+		$registry->registerRecipientType(new TokenShareRecipientType());
+		$registry->registerRecipientType(Server::get(UserShareRecipientType::class));
+
+		$registry->registerPropertyType(new ExpirationDateSharePropertyType());
+		$registry->markPropertyTypeCompatibleWithRecipientType(ExpirationDateSharePropertyType::class, EmailShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(ExpirationDateSharePropertyType::class, GroupShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(ExpirationDateSharePropertyType::class, TeamShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(ExpirationDateSharePropertyType::class, TokenShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(ExpirationDateSharePropertyType::class, UserShareRecipientType::class);
+
+		$registry->registerPropertyType(new LabelSharePropertyType());
+		$registry->markPropertyTypeCompatibleWithRecipientType(LabelSharePropertyType::class, TokenShareRecipientType::class);
+
+		$registry->registerPropertyType(new NoteSharePropertyType());
+		$registry->markPropertyTypeCompatibleWithRecipientType(NoteSharePropertyType::class, EmailShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(NoteSharePropertyType::class, GroupShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(NoteSharePropertyType::class, TeamShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(NoteSharePropertyType::class, TokenShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(NoteSharePropertyType::class, UserShareRecipientType::class);
+
+		$registry->registerPropertyType(new PasswordSharePropertyType());
+		$registry->markPropertyTypeCompatibleWithRecipientType(PasswordSharePropertyType::class, EmailShareRecipientType::class);
+		$registry->markPropertyTypeCompatibleWithRecipientType(PasswordSharePropertyType::class, TokenShareRecipientType::class);
+
+		$registry->registerPermissionPreset(new ViewSharePermissionPreset());
+		$registry->registerPermissionPreset(new EditSharePermissionPreset());
+
+		$registry->markPermissionTypeCompatibleWithPermissionPreset(ReshareSharePermissionType::class, EditSharePermissionPreset::class);
 	}
 
 	#[\Override]

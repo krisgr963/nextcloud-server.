@@ -51,6 +51,8 @@
 		<directory name="apps/sharing"/>
 		<directory name="core/Sharing"/>
 		<directory name="tests/Core/Sharing"/>
+		<directory name="apps/files/lib/Sharing"/>
+		<directory name="apps/files/tests/Sharing"/>
 		<ignoreFiles>
 			<!-- Circles internals are used -->
 			<file name="core/Sharing/Recipient/TeamShareRecipientType.php"/>
@@ -70,6 +72,7 @@
 		<directory name="apps/dav/lib"/>
 		<directory name="apps/files/lib"/>
 		<directory name="apps/files_sharing/lib"/>
+		<directory name="apps/files_trashbin/lib"/>
 		<directory name="apps/settings/lib"/>
 		<!-- As long as the files are not in the projectFiles list, we need to include them here to make psalm aware of our interfaces -->
 		<directory name="lib/private"/>

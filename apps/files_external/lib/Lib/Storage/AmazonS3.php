@@ -675,12 +675,14 @@ class AmazonS3 extends Common {
 	}
 
 	private function objectToMetaData(array $object): array {
+		$mtime = isset($object['LastModified']) ? strtotime($object['LastModified']) : time();
+		$etag = isset($object['ETag']) ? trim($object['ETag'], '"') : '';
 		return [
 			'name' => basename($object['Key']),
 			'mimetype' => $this->mimeDetector->detectPath($object['Key']),
-			'mtime' => strtotime($object['LastModified']),
-			'storage_mtime' => strtotime($object['LastModified']),
-			'etag' => trim($object['ETag'], '"'),
+			'mtime' => $mtime,
+			'storage_mtime' => $mtime,
+			'etag' => $etag,
 			'permissions' => Constants::PERMISSION_ALL - Constants::PERMISSION_CREATE,
 			'size' => (int)($object['Size'] ?? $object['ContentLength']),
 		];

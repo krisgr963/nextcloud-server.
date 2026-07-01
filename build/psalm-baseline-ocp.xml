@@ -5,4 +5,12 @@
       <code><![CDATA[\OC]]></code>
     </UndefinedClass>
   </file>
+  <file src="lib/public/Interaction/Actions/ShareAction.php">
+    <UndefinedClass>
+      <code><![CDATA[NodeCreateSharePermissionType]]></code>
+      <code><![CDATA[NodeDeleteSharePermissionType]]></code>
+      <code><![CDATA[NodeReadSharePermissionType]]></code>
+      <code><![CDATA[NodeUpdateSharePermissionType]]></code>
+    </UndefinedClass>
+  </file>
 </files>

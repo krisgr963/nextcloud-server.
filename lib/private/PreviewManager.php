@@ -70,13 +70,13 @@ class PreviewManager implements IPreview {
 	private ?Generator $generator = null;
 	protected bool $providerListDirty = false;
 	protected bool $registeredCoreProviders = false;
-	/**
-	 * @var array<string, list<ProviderClosure>> $providers
-	 */
+
+	/** @var array<string, list<ProviderClosure>> $providers */
 	protected array $providers = [];
 
 	/** @var array mime type => support status */
 	protected array $mimeTypeSupportMap = [];
+
 	/** @var ?list<class-string<IProviderV2>> $defaultProviders */
 	protected ?array $defaultProviders = null;
 
@@ -108,8 +108,7 @@ class PreviewManager implements IPreview {
 	 * @param string $mimeTypeRegex Regex with the mime types that are supported by this provider
 	 * @param ProviderClosure $callable
 	 */
-	#[\Override]
-	public function registerProvider(string $mimeTypeRegex, Closure $callable): void {
+	private function registerProviderClosure(string $mimeTypeRegex, Closure $callable): void {
 		if (!$this->enablePreviews) {
 			return;
 		}
@@ -121,9 +120,6 @@ class PreviewManager implements IPreview {
 		$this->providerListDirty = true;
 	}
 
-	/**
-	 * Get all providers
-	 */
 	#[\Override]
 	public function getProviders(): array {
 		if (!$this->enablePreviews) {
@@ -214,9 +210,7 @@ class PreviewManager implements IPreview {
 			return $this->mimeTypeSupportMap[$mimeType];
 		}
 
-		$this->registerCoreProviders();
-		$this->registerBootstrapProviders();
-		$providerMimeTypes = array_keys($this->providers);
+		$providerMimeTypes = array_keys($this->getProviders());
 		foreach ($providerMimeTypes as $supportedMimeType) {
 			if (preg_match($supportedMimeType, $mimeType)) {
 				$this->mimeTypeSupportMap[$mimeType] = true;
@@ -235,7 +229,6 @@ class PreviewManager implements IPreview {
 
 		$fileMimeType = $mimeType ?? $file->getMimeType();
 
-		$this->registerCoreProviders();
 		if (!$this->isMimeSupported($fileMimeType)) {
 			return false;
 		}
@@ -245,7 +238,7 @@ class PreviewManager implements IPreview {
 			return false;
 		}
 
-		foreach ($this->providers as $supportedMimeType => $providers) {
+		foreach ($this->getProviders() as $supportedMimeType => $providers) {
 			if (preg_match($supportedMimeType, $fileMimeType)) {
 				foreach ($providers as $providerClosure) {
 					$provider = $this->helper->getProvider($providerClosure);
@@ -302,7 +295,8 @@ class PreviewManager implements IPreview {
 	 */
 	protected function registerCoreProvider(string $class, string $mimeType, array $options = []): void {
 		if (in_array(trim($class, '\\'), $this->getEnabledDefaultProvider())) {
-			$this->registerProvider($mimeType, function () use ($class, $options) {
+			$this->registerProviderClosure($mimeType, function () use ($class, $options): IProviderV2 {
+				/** @var IProviderV2 $class */
 				return new $class($options);
 			});
 		}
@@ -428,7 +422,7 @@ class PreviewManager implements IPreview {
 			}
 			$this->loadedBootstrapProviders[$key] = null;
 
-			$this->registerProvider($provider->getMimeTypeRegex(), function () use ($provider): IProviderV2|false {
+			$this->registerProviderClosure($provider->getMimeTypeRegex(), function () use ($provider): IProviderV2|false {
 				try {
 					return $this->container->get($provider->getService());
 				} catch (NotFoundExceptionInterface) {

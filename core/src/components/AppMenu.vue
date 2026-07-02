@@ -54,10 +54,17 @@
 			:aria-expanded="opened ? 'true' : 'false'"
 			@click="onTriggerClick('currentApp')">
 			<template #icon>
+				<!-- Settings sub-sections share one generic cog. An inline MDI icon
+					inherits the button's currentColor (--color-background-plain-text),
+					so it stays legible on both bright and dark headers without a filter. -->
+				<IconCog
+					v-if="currentApp.type === 'settings'"
+					class="app-menu__current-app-cog"
+					:size="20" />
 				<img
+					v-else
 					class="app-menu__current-app-icon"
-					:class="{ 'app-menu__current-app-icon--settings': currentApp.type === 'settings' }"
-					:src="displayIcon"
+					:src="currentApp.icon"
 					alt=""
 					aria-hidden="true">
 			</template>
@@ -79,6 +86,7 @@ import { generateUrl, imagePath } from '@nextcloud/router'
 import { defineComponent, ref } from 'vue'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcPopover from '@nextcloud/vue/components/NcPopover'
+import IconCog from 'vue-material-design-icons/Cog.vue'
 import IconDotsGrid from 'vue-material-design-icons/DotsGrid.vue'
 import AppItem from './AppItem.vue'
 import logger from '../logger.js'
@@ -91,6 +99,7 @@ export default defineComponent({
 
 	components: {
 		AppItem,
+		IconCog,
 		IconDotsGrid,
 		NcButton,
 		NcPopover,
@@ -148,7 +157,7 @@ export default defineComponent({
 			// `placement: bottom-start` swaps the anchor edge under RTL but the
 			// skidding sign isn't auto-mirrored, so we flip it here. Snapshot
 			// at init: Nextcloud's language doesn't change at runtime.
-			popoverSkidding: isRTL() ? 82 : -82,
+			popoverSkidding: isRTL() ? 82 : -82, // thats the width of the product logo + main container margin
 		}
 	},
 
@@ -170,17 +179,6 @@ export default defineComponent({
 			return this.currentApp.type === 'settings'
 				? t('core', 'Settings')
 				: this.currentApp.name
-		},
-
-		// Match the collapsed label: a generic cog for any settings
-		// sub-section instead of the per-section icon.
-		displayIcon(): string {
-			if (!this.currentApp) {
-				return ''
-			}
-			return this.currentApp.type === 'settings'
-				? imagePath('core', 'actions/settings-dark.svg')
-				: this.currentApp.icon
 		},
 
 		// aria-label overrides the inner span text, so the displayed name
@@ -466,12 +464,10 @@ export default defineComponent({
 		// Theme-aware inversion + vertical alpha fade via --header-menu-icon-mask.
 		filter: var(--background-image-invert-if-bright);
 		mask: var(--header-menu-icon-mask);
+	}
 
-		// Settings icons ship dark (designed for the white settings sidebar);
-		// force-white so they read against the themed header.
-		&--settings {
-			filter: brightness(0) invert(1);
-		}
+	&__current-app-cog {
+		mask: var(--header-menu-icon-mask);
 	}
 
 	&__current-app-name {
@@ -535,7 +531,7 @@ export default defineComponent({
 // recomputed. Used instead of NcPopover's :distance prop, which isn't
 // exposed in the released @nextcloud/vue yet.
 .app-menu__popover-base .v-popper__wrapper {
-	margin-block-start: -1px;
+	margin-block-start: -5px;
 }
 
 // Without this reset the override above cascades into AppItem and inflates

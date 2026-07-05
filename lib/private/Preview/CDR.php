@@ -1,6 +1,15 @@
 <?php
+
 declare(strict_types=1);
+
+/**
+ * SPDX-FileCopyrightText: 2016-2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2016 ownCloud, Inc.
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 namespace OC\Preview;
+
 use OCP\Files\File;
 use OCP\Files\FileInfo;
 use OCP\IImage;
@@ -48,12 +57,16 @@ class CDR extends ProviderV2 {
 			return null;
 		}
 
-		/** * CDR files created by newer CorelDRAW versions store the embedded preview in previews/thumbnail.png.
-		    * OLD CDR format (BMP thumbnail) * metadata/thumbnails/thumbnail.bmp */
+		/**
+		 * Newer CorelDRAW files store the embedded preview in previews/thumbnail.png.
+		 *
+		 * Older CorelDRAW files store the embedded BMP thumbnail in
+		 * metadata/thumbnails/thumbnail.bmp.
+		 */
 		foreach ([
-					 'previews/thumbnail.png',
-					 'metadata/thumbnails/thumbnail.bmp',
-				 ] as $thumbnail) {
+			'previews/thumbnail.png',
+			'metadata/thumbnails/thumbnail.bmp',
+		] as $thumbnail) {
 			$idx = $zip->locateName($thumbnail);
 
 			if ($idx === false) {

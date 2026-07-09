@@ -27,6 +27,7 @@ use OCP\SystemTag\TagAlreadyExistsException;
 use OCP\SystemTag\TagCreationForbiddenException;
 use OCP\SystemTag\TagNotFoundException;
 use OCP\SystemTag\TagUpdateForbiddenException;
+use OCP\Util;
 
 /**
  * Manager class for system tags
@@ -173,6 +174,8 @@ class SystemTagManager implements ISystemTagManager {
 			throw new TagCreationForbiddenException();
 		}
 
+		$tagName = Util::sanitizeWordsAndEmojis($tagName);
+
 		// Check if tag already exists (case-insensitive)
 		$existingTags = $this->getAllTags(null, $tagName);
 		foreach ($existingTags as $existingTag) {
@@ -245,8 +248,9 @@ class SystemTagManager implements ISystemTagManager {
 		}
 
 		$beforeUpdate = array_shift($tags);
+		$newName = Util::sanitizeWordsAndEmojis($newName);
+
 		// Length of name column is 64
-		$newName = trim($newName);
 		$truncatedNewName = substr($newName, 0, 64);
 		$afterUpdate = new SystemTag(
 			$tagId,
@@ -480,5 +484,4 @@ class SystemTagManager implements ISystemTagManager {
 
 		return $groupIds;
 	}
-
 }

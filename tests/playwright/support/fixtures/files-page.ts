@@ -4,6 +4,7 @@
  */
 
 import { CopyMoveDialogPage } from '../sections/CopyMoveDialogPage.ts'
+import { FilesFilterPage } from '../sections/FilesFilterPage.ts'
 import { FilesListPage } from '../sections/FilesListPage.ts'
 import { FilesNavigationPage } from '../sections/FilesNavigationPage.ts'
 import { FilesSidebarPage } from '../sections/FilesSidebarPage.ts'
@@ -12,6 +13,7 @@ import { test as baseTest } from './random-user-session.ts'
 type FilesFixtures = {
 	filesListPage: FilesListPage
 	filesNavigation: FilesNavigationPage
+	filesFilter: FilesFilterPage
 	filesSidebar: FilesSidebarPage
 	copyMoveDialog: CopyMoveDialogPage
 }
@@ -23,6 +25,10 @@ export const test = baseTest.extend<FilesFixtures>({
 
 	filesNavigation: async ({ page }, use) => {
 		await use(new FilesNavigationPage(page))
+	},
+
+	filesFilter: async ({ page }, use) => {
+		await use(new FilesFilterPage(page))
 	},
 
 	filesSidebar: async ({ page }, use) => {

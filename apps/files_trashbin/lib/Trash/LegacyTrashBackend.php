@@ -15,18 +15,19 @@ use OCA\Files_Trashbin\Trashbin;
 use OCP\Files\FileInfo;
 use OCP\Files\Folder;
 use OCP\Files\IRootFolder;
+use OCP\Files\Node;
 use OCP\Files\NotFoundException;
 use OCP\Files\Storage\IStorage;
 use OCP\IUser;
 use OCP\IUserManager;
 
 class LegacyTrashBackend implements ITrashBackend {
-	/** @var array */
-	private $deletedFiles = [];
+	/** @var array<string, string> */
+	private array $deletedFiles = [];
 
 	public function __construct(
-		private IRootFolder $rootFolder,
-		private IUserManager $userManager,
+		private readonly IRootFolder $rootFolder,
+		private readonly IUserManager $userManager,
 	) {
 	}
 
@@ -113,7 +114,7 @@ class LegacyTrashBackend implements ITrashBackend {
 	}
 
 	#[\Override]
-	public function getTrashNodeById(IUser $user, int $fileId) {
+	public function getTrashNodeById(IUser $user, int $fileId): ?Node {
 		try {
 			$userFolder = $this->rootFolder->getUserFolder($user->getUID());
 			$trash = $userFolder->getParent()->get('files_trashbin/files');

@@ -955,6 +955,7 @@ class ManagerTest extends \Test\TestCase {
 		$share->method('getAttributes')->willReturn($attributes);
 		$share->method('getExpirationDate')->willReturn($expireDate);
 		$share->method('getPassword')->willReturn($password);
+		$share->method('isPasswordProtected')->willReturn(!empty($password));
 
 		return $share;
 	}
@@ -4126,6 +4127,7 @@ class ManagerTest extends \Test\TestCase {
 		$this->assertFalse($this->manager->checkPassword($share, 'password'));
 
 		$share->method('getPassword')->willReturn('password');
+		$share->method('isPasswordProtected')->willReturn(true);
 		$this->assertFalse($this->manager->checkPassword($share, null));
 	}
 
@@ -4133,6 +4135,7 @@ class ManagerTest extends \Test\TestCase {
 		$share = $this->createMock(IShare::class);
 		$share->method('getShareType')->willReturn(IShare::TYPE_LINK);
 		$share->method('getPassword')->willReturn('password');
+		$share->method('isPasswordProtected')->willReturn(true);
 
 		$this->hasher->method('verify')->with('invalidpassword', 'password', '')->willReturn(false);
 
@@ -4143,6 +4146,7 @@ class ManagerTest extends \Test\TestCase {
 		$share = $this->createMock(IShare::class);
 		$share->method('getShareType')->willReturn(IShare::TYPE_LINK);
 		$share->method('getPassword')->willReturn('passwordHash');
+		$share->method('isPasswordProtected')->willReturn(true);
 
 		$this->hasher->method('verify')->with('password', 'passwordHash', '')->willReturn(true);
 

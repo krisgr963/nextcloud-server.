@@ -5,23 +5,30 @@
 <template>
 	<div class="unified-search-menu">
 		<UnifiedSearchInput
+			:query="queryText"
 			:expanded="showUnifiedSearch || showLocalSearch"
-			@click="toggleUnifiedSearch" />
+			@click="openModal"
+			@update:query="queryText = $event" />
 		<UnifiedSearchLocalSearchBar
 			v-if="supportsLocalSearch"
-			:open.sync="showLocalSearch"
-			:query.sync="queryText"
-			@global-search="openModal" />
+			:open="showLocalSearch"
+			:query="queryText"
+			@globalSearch="openModal"
+			@update:open="showLocalSearch = $event"
+			@update:query="queryText = $event" />
 		<UnifiedSearchModal
-			:local-search="supportsLocalSearch"
-			:query.sync="queryText"
-			:open.sync="showUnifiedSearch" />
+			:localSearch="supportsLocalSearch"
+			:query="queryText"
+			:open="showUnifiedSearch"
+			@update:query="queryText = $event"
+			@update:open="showUnifiedSearch = $event" />
 	</div>
 </template>
 
 <script lang="ts">
 import { emit, subscribe } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
+import { useIsSmallMobile } from '@nextcloud/vue/composables/useIsMobile'
 import { useBrowserLocation } from '@vueuse/core'
 import debounce from 'debounce'
 import { defineComponent } from 'vue'
@@ -41,9 +48,11 @@ export default defineComponent({
 
 	setup() {
 		const currentLocation = useBrowserLocation()
+		const isSmallMobile = useIsSmallMobile()
 
 		return {
 			currentLocation,
+			isSmallMobile,
 
 			t,
 		}
@@ -95,6 +104,11 @@ export default defineComponent({
 		 */
 		queryText() {
 			this.debouncedQueryUpdate()
+			// Desktop opens/closes the popover as you type; mobile is driven by the
+			// header button + the modal close paths, so clearing must not collapse it.
+			if (!this.supportsLocalSearch && !this.isSmallMobile) {
+				this.showUnifiedSearch = this.queryText.length > 0
+			}
 		},
 	},
 
@@ -122,7 +136,7 @@ export default defineComponent({
 		logger.debug('Unified search initialized!')
 	},
 
-	beforeDestroy() {
+	beforeUnmount() {
 		// keep in mind to remove the event listener
 		window.removeEventListener('keydown', this.onKeyDown)
 	},
@@ -184,6 +198,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 // this is needed to allow us overriding component styles (focus-visible)
 .unified-search-menu {
+	// Positioning context so the results popover can anchor under the input
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;

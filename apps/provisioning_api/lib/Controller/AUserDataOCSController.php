@@ -275,10 +275,13 @@ abstract class AUserDataOCSController extends OCSController {
 		$groupIds = array_unique($groupIds);
 		sort($groupIds);
 
-		return array_map(function ($groupId) {
-			$displayname = $this->groupDisplayNameCache->getDisplayName($groupId) ?? $groupId;
-			return ['id' => $groupId, 'displayname' => $displayname];
-		}, $groupIds);
+		$info = [];
+		foreach ($this->groupDisplayNameCache->getDisplayNames($groupIds) as $groupId => $displayName) {
+			if ($displayName !== null) {
+				$info[] = ['id' => $groupId, 'displayname' => $displayName];
+			}
+		}
+		return $info;
 	}
 
 	/**

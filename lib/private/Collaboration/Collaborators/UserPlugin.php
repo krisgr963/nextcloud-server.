@@ -135,7 +135,10 @@ readonly class UserPlugin implements ISearchPlugin {
 					$uid = $row['uid'];
 					$email = $row['value'];
 					$isAdditional = $row['name'] === 'additional_mail';
-					$users[$uid] = ['exact', $this->userManager->get($uid), $isAdditional ? $email : null];
+					$user = $this->userManager->get($uid);
+					if ($user !== null && $user->isEnabled()) {
+						$users[$uid] = ['exact', $user, $isAdditional ? $email : null];
+					}
 				}
 				$result->closeCursor();
 			}

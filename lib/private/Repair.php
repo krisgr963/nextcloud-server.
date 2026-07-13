@@ -11,6 +11,7 @@ namespace OC;
 use OC\Repair\AddBruteForceCleanupJob;
 use OC\Repair\AddCleanupBackgroundJobsJob;
 use OC\Repair\AddCleanupDeletedUsersBackgroundJob;
+use OC\Repair\AddCleanupLoginTokens;
 use OC\Repair\AddCleanupUpdaterBackupsJob;
 use OC\Repair\AddMetadataGenerationJob;
 use OC\Repair\AddMovePreviewJob;
@@ -194,6 +195,7 @@ class Repair implements IOutput {
 			Server::get(RepairLogoDimension::class),
 			Server::get(RemoveLegacyDatadirFile::class),
 			Server::get(AddCleanupDeletedUsersBackgroundJob::class),
+			Server::get(AddCleanupLoginTokens::class),
 			Server::get(SanitizeAccountProperties::class),
 			Server::get(AddMovePreviewJob::class),
 			Server::get(ConfigKeyMigration::class),

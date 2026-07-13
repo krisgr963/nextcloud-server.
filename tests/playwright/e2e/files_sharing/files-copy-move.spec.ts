@@ -3,38 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { User } from '@nextcloud/e2e-test-server'
-import type { APIRequestContext } from '@playwright/test'
-
 import { expect, test } from '../../support/fixtures/files-sharing-page.ts'
-import { getChildPermissions, mkdir, uploadContent } from '../../support/utils/dav.ts'
-import { ALL_PERMISSIONS, createShare, SharePermission } from '../../support/utils/sharing.ts'
+import { mkdir, uploadContent } from '../../support/utils/dav.ts'
+import {
+	ALL_PERMISSIONS,
+	createShare,
+	SharePermission,
+	waitForShare,
+} from '../../support/utils/sharing.ts'
 
 const EMPTY = Buffer.alloc(0)
-
-/**
- * A share mounts into the recipient's tree asynchronously, and permission changes
- * propagate after that. Poll the recipient's directory listing for the entry's
- * `oc:permissions` (the same source the Files UI reads) until it exists and
- * satisfies `ready`, before driving the UI. Transient errors (mount not there
- * yet) are swallowed so the poll keeps waiting.
- */
-async function waitForShare(
-	request: APIRequestContext,
-	user: User,
-	parentPath: string,
-	childName: string,
-	ready: (permissions: string) => boolean = () => true,
-): Promise<void> {
-	await expect.poll(async () => {
-		try {
-			const permissions = await getChildPermissions(request, user, parentPath, childName)
-			return permissions !== '' && ready(permissions)
-		} catch {
-			return false
-		}
-	}, { message: `share ${parentPath}/${childName} did not propagate to ${user.userId}`, timeout: 20_000 }).toBe(true)
-}
 
 test.describe('files_sharing: Move or copy files', () => {
 	test('can create a file in a shared folder', async ({ page, user, owner, ownerRequest, filesListPage }) => {

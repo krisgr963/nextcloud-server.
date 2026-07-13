@@ -3,8 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import type { User } from '@nextcloud/e2e-test-server'
 import type { Permission } from '@nextcloud/files'
 import type { APIRequestContext } from '@playwright/test'
+
+import { expect } from '../matchers.ts'
+import { getChildPermissions } from './dav.ts'
 
 // we cannot import the enum directly from the files app.
 // It references the window object and causes errors when imported in a node context,
@@ -28,6 +32,9 @@ export const ALL_PERMISSIONS = SharePermission.READ
 export const ShareType = {
 	USER: 0,
 	GROUP: 1,
+	USERGROUP: 2,
+	LINK: 3,
+	EMAIL: 4,
 } as const
 
 /**
@@ -40,22 +47,48 @@ export const ShareType = {
  * @param shareWith - The recipient: a user id for a user share, a group id for a group share
  * @param permissions - The permission bitmask to grant (defaults to all)
  * @param shareType - The OCS share type (defaults to a user share)
+ * @param password - An optional password for the share
+ * @param otpProvider - Optionally, protect the share with an OTP with the given provider
+ * @param otpRecipient - Optionally, protect the share with an OTP with the given provider
  */
 export async function createShare(
 	request: APIRequestContext,
 	path: string,
-	shareWith: string,
+	shareWith?: string,
 	permissions: number = ALL_PERMISSIONS,
 	shareType: number = ShareType.USER,
-): Promise<void> {
+	password?: string,
+	otpProvider?: string,
+	otpRecipient?: string,
+): Promise<any> {
+	const formData: {
+		path: string
+		shareType: number
+		shareWith?: string
+		permissions: number
+		password?: string
+		otpProvider?: string
+		otpRecipient?: string
+	} = {
+		path,
+		shareType,
+		permissions,
+	}
+	if (shareWith !== undefined) {
+		formData.shareWith = shareWith
+	}
+	if (password !== undefined) {
+		formData.password = password
+	}
+	if (otpProvider !== undefined) {
+		formData.otpProvider = otpProvider
+	}
+	if (otpRecipient !== undefined) {
+		formData.otpRecipient = otpRecipient
+	}
 	const response = await request.post('/ocs/v2.php/apps/files_sharing/api/v1/shares?format=json', {
 		headers: { 'OCS-APIRequest': 'true' },
-		form: {
-			path,
-			shareType,
-			shareWith,
-			permissions,
-		},
+		form: formData,
 	})
 	// OCS returns HTTP 200 even on failure; the real status lives in ocs.meta
 	const { ocs } = await response.json()
@@ -75,4 +108,30 @@ export async function createShare(
 			throw new Error(`Updating share ${ocs.data.id} failed: ${updateMeta?.statuscode} ${updateMeta?.message}`)
 		}
 	}
+
+	return ocs
+}
+
+/**
+ * A share mounts into the recipient's tree asynchronously, and permission changes
+ * propagate after that. Poll the recipient's directory listing for the entry's
+ * `oc:permissions` (the same source the Files UI reads) until it exists and
+ * satisfies `ready`, before driving the UI. Transient errors (mount not there
+ * yet) are swallowed so the poll keeps waiting.
+ */
+export async function waitForShare(
+	request: APIRequestContext,
+	user: User,
+	parentPath: string,
+	childName: string,
+	ready: (permissions: string) => boolean = () => true,
+): Promise<void> {
+	await expect.poll(async () => {
+		try {
+			const permissions = await getChildPermissions(request, user, parentPath, childName)
+			return permissions !== '' && ready(permissions)
+		} catch {
+			return false
+		}
+	}, { message: `share ${parentPath}/${childName} did not propagate to ${user.userId}`, timeout: 20_000 }).toBe(true)
 }

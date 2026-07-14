@@ -72,6 +72,11 @@ class AmazonS3 extends Common {
 		return $path === '.';
 	}
 
+	private function getCachePath(string $path): string {
+		// normalizePath() converts '' to '.' for S3 object keys, but filecache stores the root as ''
+		return $this->isRoot($path) ? '' : $path;
+	}
+
 	private function cleanKey(string $path): string {
 		if ($this->isRoot($path)) {
 			return '/';
@@ -670,12 +675,14 @@ class AmazonS3 extends Common {
 	}
 
 	private function objectToMetaData(array $object): array {
+		$mtime = isset($object['LastModified']) ? strtotime($object['LastModified']) : time();
+		$etag = isset($object['ETag']) ? trim($object['ETag'], '"') : '';
 		return [
 			'name' => basename($object['Key']),
 			'mimetype' => $this->mimeDetector->detectPath($object['Key']),
-			'mtime' => strtotime($object['LastModified']),
-			'storage_mtime' => strtotime($object['LastModified']),
-			'etag' => trim($object['ETag'], '"'),
+			'mtime' => $mtime,
+			'storage_mtime' => $mtime,
+			'etag' => $etag,
 			'permissions' => Constants::PERMISSION_ALL - Constants::PERMISSION_CREATE,
 			'size' => (int)($object['Size'] ?? $object['ContentLength']),
 		];
@@ -688,7 +695,7 @@ class AmazonS3 extends Common {
 		if ($this->versioningEnabled() && !$this->doesDirectoryExist($path)) {
 			return null;
 		}
-		$cacheEntry = $this->getCache()->get($path);
+		$cacheEntry = $this->getCache()->get($this->getCachePath($path));
 		if ($cacheEntry instanceof CacheEntry) {
 			return $cacheEntry->getData();
 		} else {

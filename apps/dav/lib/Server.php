@@ -72,6 +72,7 @@ use OCA\DAV\SystemTag\SystemTagPlugin;
 use OCA\DAV\Upload\ChunkingPlugin;
 use OCA\DAV\Upload\ChunkingV2Plugin;
 use OCA\DAV\Upload\UploadAutoMkcolPlugin;
+use OCA\DAV\Service\FileGroupingService;
 use OCA\Theming\ThemingDefaults;
 use OCP\Accounts\IAccountManager;
 use OCP\App\IAppManager;
@@ -381,7 +382,9 @@ class Server {
 						\OCP\Server::get(IRootFolder::class),
 						$shareManager,
 						$view,
-						\OCP\Server::get(IFilesMetadataManager::class)
+						\OCP\Server::get(IFilesMetadataManager::class),
+						\OCP\Server::get(FileGroupingService::class),
+						\OCP\Server::get(IAppConfig::class),
 					));
 					$this->server->addPlugin(
 						new BulkUploadPlugin(

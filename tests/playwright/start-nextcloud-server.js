@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import { configureNextcloud, runExec, runOcc, startNextcloud, stopNextcloud, waitOnNextcloud } from '@nextcloud/e2e-test-server/docker'
+import { configureNextcloud, docker, getContainer, runExec, runOcc, startNextcloud, stopNextcloud, waitOnNextcloud } from '@nextcloud/e2e-test-server/docker'
 import { existsSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -42,11 +42,13 @@ async function start() {
 		forceRecreate: true,
 	})
 
-	await runExec(['mkdir', '-p', 'apps-cypress'])
-	await runExec(['cp', 'cypress/fixtures/app.config.php', 'config'])
+	// The installer (setup) tests need to reach the database service containers
+	// (mysql, mariadb, …) that CI exposes on the GitHub Actions network. Join it
+	// when present; a no-op locally and in the normal test job where it is absent.
+	await connectToActionsNetwork()
 
 	await waitOnNextcloud(ip)
-	await configureNextcloud()
+	await configureNextcloud(process.env.PLAYWRIGHT_SETUP ? [] : ['viewer'])
 
 	process.stdout.write('\nApply custom configuration for Playwright tests\n')
 	await runExec(['php', '-r', '$db = new SQLite3("data/owncloud.db");$db->busyTimeout(5000);$db->exec("PRAGMA journal_mode = wal;");'])
@@ -66,6 +68,22 @@ async function start() {
 	await runExec(['php', 'cron.php'])
 	process.stdout.write('│  └─ OK !\n')
 	process.stdout.write('└─ Nextcloud container ready to run Playwright tests\n')
+}
+
+/**
+ * Connect the Nextcloud container to the GitHub Actions bridge network (named
+ * `github_network*`) if it exists, so it can resolve the database service
+ * containers by hostname. Does nothing when the network is absent.
+ */
+async function connectToActionsNetwork() {
+	const networks = await docker.listNetworks()
+	const network = networks.find((n) => n.Name.startsWith('github_network'))
+	if (!network) {
+		return
+	}
+
+	await docker.getNetwork(network.Id).connect({ Container: getContainer().id })
+	process.stdout.write('├─ Connected to the GitHub Actions network for the setup tests\n')
 }
 
 async function stop() {

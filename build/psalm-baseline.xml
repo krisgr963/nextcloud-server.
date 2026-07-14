@@ -218,9 +218,6 @@
     </DeprecatedMethod>
   </file>
   <file src="apps/dav/lib/CalDAV/CalendarHome.php">
-    <DeprecatedMethod>
-      <code><![CDATA[getL10N]]></code>
-    </DeprecatedMethod>
     <InvalidNullableReturnType>
       <code><![CDATA[INode]]></code>
     </InvalidNullableReturnType>
@@ -282,11 +279,6 @@
     <FalsableReturnStatement>
       <code><![CDATA[fread($this->source, $end - $start)]]></code>
     </FalsableReturnStatement>
-  </file>
-  <file src="apps/dav/lib/CalDAV/InvitationResponse/InvitationResponseServer.php">
-    <DeprecatedMethod>
-      <code><![CDATA[getL10N]]></code>
-    </DeprecatedMethod>
   </file>
   <file src="apps/dav/lib/CalDAV/Outbox.php">
     <DeprecatedMethod>
@@ -762,11 +754,6 @@
       <code><![CDATA[getPath]]></code>
     </UndefinedInterfaceMethod>
   </file>
-  <file src="apps/dav/lib/Connector/Sabre/MaintenancePlugin.php">
-    <DeprecatedMethod>
-      <code><![CDATA[getL10N]]></code>
-    </DeprecatedMethod>
-  </file>
   <file src="apps/dav/lib/Connector/Sabre/Node.php">
     <InternalMethod>
       <code><![CDATA[changeLock]]></code>
@@ -1005,11 +992,6 @@
       <code><![CDATA[generate]]></code>
     </DeprecatedMethod>
   </file>
-  <file src="apps/dav/lib/RootCollection.php">
-    <DeprecatedMethod>
-      <code><![CDATA[getL10N]]></code>
-    </DeprecatedMethod>
-  </file>
   <file src="apps/dav/lib/Search/ACalendarSearchProvider.php">
     <UndefinedMagicPropertyFetch>
       <code><![CDATA[$component->{'RECURRENCE-ID'}]]></code>
@@ -1056,8 +1038,6 @@
       <code><![CDATA[dispatch]]></code>
       <code><![CDATA[getAppValue]]></code>
       <code><![CDATA[getAppValue]]></code>
-      <code><![CDATA[getL10N]]></code>
-      <code><![CDATA[getL10N]]></code>
       <code><![CDATA[getUserFolder]]></code>
       <code><![CDATA[getUserFolder]]></code>
     </DeprecatedMethod>
@@ -1650,10 +1630,6 @@
     </ConstructorSignatureMismatch>
   </file>
   <file src="apps/files_sharing/lib/AppInfo/Application.php">
-    <DeprecatedMethod>
-      <code><![CDATA[query]]></code>
-      <code><![CDATA[query]]></code>
-    </DeprecatedMethod>
     <RedundantCondition>
       <code><![CDATA[$event instanceof OldGenericEvent]]></code>
     </RedundantCondition>
@@ -2727,10 +2703,6 @@
     </RedundantCast>
   </file>
   <file src="apps/user_ldap/lib/AppInfo/Application.php">
-    <DeprecatedInterface>
-      <code><![CDATA[IAppContainer]]></code>
-      <code><![CDATA[IAppContainer]]></code>
-    </DeprecatedInterface>
     <DeprecatedMethod>
       <code><![CDATA[Util::connectHook(
 			'\OCA\Files_Sharing\API\Server2Server',
@@ -2860,7 +2832,6 @@
       <code><![CDATA[getAppValue]]></code>
       <code><![CDATA[getAppValue]]></code>
       <code><![CDATA[getAppValue]]></code>
-      <code><![CDATA[query]]></code>
     </DeprecatedMethod>
     <UndefinedInterfaceMethod>
       <code><![CDATA[registerProvider]]></code>

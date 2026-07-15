@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2017-2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2017-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-FileCopyrightText: 2016 ownCloud, Inc.
  * SPDX-License-Identifier: AGPL-3.0-only
  */
@@ -43,6 +43,7 @@ use OCP\ISession;
 use OCP\IURLGenerator;
 use OCP\IUser;
 use OCP\IUserManager;
+use OCP\OneTimePassword\IManager as IOTPManager;
 use OCP\Security\ISecureRandom;
 use OCP\Server;
 use OCP\Share\Exceptions\ShareNotFound;
@@ -80,12 +81,14 @@ class ShareControllerTest extends \Test\TestCase {
 	private IEventDispatcher&MockObject $eventDispatcher;
 	private FederatedShareProvider&MockObject $federatedShareProvider;
 	private IPublicShareTemplateFactory&MockObject $publicShareTemplateFactory;
+	private IOTPManager $otpManager;
 
 	protected function setUp(): void {
 		parent::setUp();
 		$this->appName = 'files_sharing';
 
 		$this->shareManager = $this->createMock(Manager::class);
+		$this->otpManager = $this->createMock(IOTPManager::class);
 		$this->urlGenerator = $this->createMock(IURLGenerator::class);
 		$this->session = $this->createMock(ISession::class);
 		$this->previewManager = $this->createMock(IPreview::class);
@@ -144,6 +147,7 @@ class ShareControllerTest extends \Test\TestCase {
 			$this->secureRandom,
 			$this->defaults,
 			$this->publicShareTemplateFactory,
+			$this->otpManager,
 		);
 
 		// Store current user
@@ -702,6 +706,7 @@ class ShareControllerTest extends \Test\TestCase {
 	public function testDownloadShareWithCreateOnlyShare(): void {
 		$share = $this->getMockBuilder(IShare::class)->getMock();
 		$share->method('getPassword')->willReturn('password');
+		$share->method('isPasswordProtected')->willReturn(true);
 		$share
 			->expects($this->once())
 			->method('getPermissions')
@@ -728,6 +733,7 @@ class ShareControllerTest extends \Test\TestCase {
 
 		$share = $this->createMock(IShare::class);
 		$share->method('getPassword')->willReturn('password');
+		$share->method('isPasswordProtected')->willReturn(true);
 		$share->expects(self::once())
 			->method('getPermissions')
 			->willReturn(Constants::PERMISSION_READ);

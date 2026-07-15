@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2016-2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2016-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-FileCopyrightText: 2016 ownCloud, Inc.
  * SPDX-License-Identifier: AGPL-3.0-only
  */
@@ -1427,8 +1427,8 @@ class Manager implements IManager {
 	#[Override]
 	public function checkPassword(IShare $share, ?string $password): bool {
 
-		// if there is no password on the share object / passsword is null, there is nothing to check
-		if ($password === null || $share->getPassword() === null) {
+		// if the share is not password protected or the password to check is empty, there is nothing to check
+		if ($password === null || !$share->isPasswordProtected()) {
 			return false;
 		}
 

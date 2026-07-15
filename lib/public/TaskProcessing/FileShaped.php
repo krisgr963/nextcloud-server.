@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2024 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -15,7 +15,7 @@ use OCP\AppFramework\Attribute\Consumable;
  * @since 35.0.0
  */
 #[Consumable(since: '35.0.0')]
-class FileShaped {
+final class FileShaped {
 	/**
 	 * @param EShapeType $shapeType
 	 * @param string $data
@@ -26,8 +26,9 @@ class FileShaped {
 	public function __construct(
 		private EShapeType $shapeType,
 		private string $data,
-		private string $extension = 'bin',
+		private string $extension = '',
 	) {
+		$this->extension = self::sanitizeExtension($this->extension);
 	}
 
 	/**
@@ -60,6 +61,9 @@ class FileShaped {
 			return '';
 		}
 		$ext = str_replace(['.', '/'], '', $ext);
+		$ext = preg_replace("/[^A-Za-z0-9]/", '', $ext) ?? $ext;
+		$ext = strtolower($ext);
+		$ext = substr($ext, 0 , 16);
 		return $ext;
 	}
 }

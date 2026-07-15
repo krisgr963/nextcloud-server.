@@ -990,6 +990,7 @@ class ComposerStaticInit749170dad3f5e7f9ca158f5a9f04f6a2
         'OCP\\TaskProcessing\\Exception\\UnauthorizedException' => __DIR__ . '/../../..' . '/lib/public/TaskProcessing/Exception/UnauthorizedException.php',
         'OCP\\TaskProcessing\\Exception\\UserFacingProcessingException' => __DIR__ . '/../../..' . '/lib/public/TaskProcessing/Exception/UserFacingProcessingException.php',
         'OCP\\TaskProcessing\\Exception\\ValidationException' => __DIR__ . '/../../..' . '/lib/public/TaskProcessing/Exception/ValidationException.php',
+        'OCP\\TaskProcessing\\FileShaped' => __DIR__ . '/../../..' . '/lib/public/TaskProcessing/FileShaped.php',
         'OCP\\TaskProcessing\\IInternalTaskType' => __DIR__ . '/../../..' . '/lib/public/TaskProcessing/IInternalTaskType.php',
         'OCP\\TaskProcessing\\IManager' => __DIR__ . '/../../..' . '/lib/public/TaskProcessing/IManager.php',
         'OCP\\TaskProcessing\\IProvider' => __DIR__ . '/../../..' . '/lib/public/TaskProcessing/IProvider.php',

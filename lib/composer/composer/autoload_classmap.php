@@ -949,6 +949,7 @@ return array(
     'OCP\\TaskProcessing\\Exception\\UnauthorizedException' => $baseDir . '/lib/public/TaskProcessing/Exception/UnauthorizedException.php',
     'OCP\\TaskProcessing\\Exception\\UserFacingProcessingException' => $baseDir . '/lib/public/TaskProcessing/Exception/UserFacingProcessingException.php',
     'OCP\\TaskProcessing\\Exception\\ValidationException' => $baseDir . '/lib/public/TaskProcessing/Exception/ValidationException.php',
+    'OCP\\TaskProcessing\\FileShaped' => $baseDir . '/lib/public/TaskProcessing/FileShaped.php',
     'OCP\\TaskProcessing\\IInternalTaskType' => $baseDir . '/lib/public/TaskProcessing/IInternalTaskType.php',
     'OCP\\TaskProcessing\\IManager' => $baseDir . '/lib/public/TaskProcessing/IManager.php',
     'OCP\\TaskProcessing\\IProvider' => $baseDir . '/lib/public/TaskProcessing/IProvider.php',
